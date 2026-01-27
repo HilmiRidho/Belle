@@ -1,0 +1,52 @@
+{
+  "/": [
+    {"name": "Documents", "type": "folder"},
+    {"name": "Download", "type": "folder"},
+    {"name": "Fonts", "type": "folder"},
+    {"name": "icons", "type": "folder"},
+    {"name": "Music", "type": "folder"},
+    {"name": "pack", "type": "folder"},
+    {"name": "Pictures", "type": "folder"},
+    {"name": "Videos", "type": "folder"},
+    {"name": "bg.jpg", "type": "file"},
+    {"name": "filesystem.json", "type": "file"},
+    {"name": "index.html", "type": "file"},
+    {"name": "style.css", "type": "file"},
+    {"name": "script.js", "type": "file"}
+  ],
+  "/Documents": [
+  ],
+  "/Download": [
+  ],
+  "/icons": [
+    {"name": "App_Manager.png", "type": "file"},
+    {"name": "Calendar.png", "type": "file"},
+    {"name": "Compass.png", "type": "file"},
+    {"name": "Contact.png", "type": "file"},
+    {"name": "Converter.png", "type": "file"},
+    {"name": "Download.png", "type": "file"},
+    {"name": "File_Manager.png", "type": "file"},
+    {"name": "Gallery.png", "type": "file"},
+    {"name": "Games.png", "type": "file"},
+    {"name": "Maps.png", "type": "file"},
+    {"name": "Messenger.png", "type": "file"},
+    {"name": "Music.png", "type": "file"},
+    {"name": "Network.png", "type": "file"},
+    {"name": "Radio.png", "type": "file"},
+    {"name": "Search.png", "type": "file"},
+    {"name": "Store.png", "type": "file"},
+    {"name": "Video.png", "type": "file"},
+    {"name": "Browser.png", "type": "file" },
+    {"name": "Notepad.png", "type": "file" },
+    {"name": "send_files.png", "type": "file"}
+  ],
+  "/Music": [
+    {"name": "untitled.mp3", "type": "file"}
+  ],
+  "/pack": [
+  ],
+  "/Pictures": [
+  ],
+  "/Videos": [
+  ]
+}
