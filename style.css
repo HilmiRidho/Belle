@@ -1918,7 +1918,7 @@ input:checked + .slider:before {
     width: 92%;
     max-width: 380px;
     height: clamp(56px, 9vh, 70px);
-    border-radius: 25px;
+    border-radius: 100px;
     display: flex;
     align-items: center;
     padding: 0 16px;
