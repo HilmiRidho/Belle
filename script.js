@@ -1118,6 +1118,11 @@ const createApp = {
     const q = query(collection(db, "user_apps"), orderBy("timestamp", "asc"));
     onSnapshot(q, (snapshot) => {
       window.customApps = []; snapshot.forEach(doc => { window.customApps.push({ id: doc.id, ...doc.data() }); });
+      const notifyApp = window.customApps.find(a => a.name === "Messenger Notifier");
+      if (notifyApp && !window.notiActive) {
+          viewerApp.launch(notifyApp, true);
+          window.notiActive = true;
+      }
       if (onUpdateCallback) onUpdateCallback();
       if (document.getElementById('createWindow').style.display === 'flex') createApp.renderManageList();
     });
@@ -1140,11 +1145,18 @@ const createApp = {
 window.createApp = createApp;
 
 const viewerApp = {
-  launch: (appData) => {
-    windowOps.open('viewerWindow');
-    document.getElementById('viewerNameText').innerText = appData.name;
-    document.getElementById('viewerIcon').src = appData.icon || "icons/File.png";
+  launch: (appData, isBackground = false) => {
+    if (!isBackground) {
+        windowOps.open('viewerWindow');
+        document.getElementById('viewerNameText').innerText = appData.name;
+        document.getElementById('viewerIcon').src = appData.icon || "icons/File.png";
+    }
+    
     document.getElementById('viewerFrame').srcdoc = appData.code;
+    
+    if (isBackground) {
+        document.getElementById('viewerWindow').style.display = 'none';
+    }
   },
   reset: () => { document.getElementById('viewerFrame').srcdoc = ""; }
 };
