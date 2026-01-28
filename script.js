@@ -1149,3 +1149,17 @@ const viewerApp = {
   reset: () => { document.getElementById('viewerFrame').srcdoc = ""; }
 };
 window.viewerApp = viewerApp;
+
+window.triggerSystemNotification = (user, msg, icon = 'Messenger.png') => {
+    const overlay = document.getElementById('sys-overlay');
+    document.getElementById('sys-noti-user').innerText = user;
+    document.getElementById('sys-noti-text').innerText = msg;
+    document.getElementById('sys-noti-img').src = `icons/${icon}`;
+    
+    overlay.classList.add('show');
+    if (!isMuted) new Audio('pop.ogg').play();
+
+    setTimeout(() => {
+        overlay.classList.remove('show');
+    }, 4500);
+};
