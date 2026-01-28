@@ -7,6 +7,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="sys-overlay" class="sys-noti-overlay">
+  <div class="sys-noti-pill" onclick="this.parentElement.classList.remove('show')">
+    <div class="sys-noti-icon">
+      <img id="sys-noti-img" src="icons/Messenger.png" alt="icon">
+    </div>
+    <div class="sys-noti-content">
+      <div id="sys-noti-user" class="sys-noti-title">Messenger</div>
+      <div id="sys-noti-text" class="sys-noti-text">Pesan baru diterima</div>
+    </div>
+  </div>
+</div>
   <div class="topbar"></div>
 
   <header class="header">
