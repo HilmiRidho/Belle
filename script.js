@@ -1025,6 +1025,23 @@ const notepadApp = {
 window.notepadApp = notepadApp;
 
 function setupGlobalEvents() {
+  const msgInput = document.getElementById("msgInput");
+  if (msgInput) {
+    msgInput.onkeydown = (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        messengerApp.send();
+      }
+    };
+  }
+
+  const searchInput = document.getElementById("search");
+  if (searchInput) {
+    searchInput.oninput = e => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.app').forEach(a => { a.style.display = a.dataset.name.includes(q) ? "" : "none"; });
+    };
+  }
   document.addEventListener("contextmenu", e => {
     if (e.target.closest('#fmContent')) {
       e.preventDefault();
