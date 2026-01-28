@@ -878,14 +878,23 @@ window.musicApp = musicApp;
 const keyboardSystem = {
   activeInput: null, isCaps: false, isShiftTemp: false, isSym: false, lastShiftClick: 0, delInterval: null, delTimer: null, board: null,
   init: () => {
-    keyboardSystem.board = document.getElementById('virtualKeyboard'); keyboardSystem.render();
-    document.addEventListener('focusin', (e) => {
+    keyboardSystem.board = document.getElementById('virtualKeyboard'); 
+    keyboardSystem.render();
+    document.addEventListener('mousedown', (e) => {
       const textInputTypes = ['text', 'password', 'email', 'number', 'search', 'tel', 'url'];
-      const isTextArea = e.target.tagName === 'TEXTAREA';
-      const isTextInput = e.target.tagName === 'INPUT' && textInputTypes.includes(e.target.type);
-      if (isTextInput || isTextArea) { e.target.inputMode = "none"; keyboardSystem.activeInput = e.target; keyboardSystem.show(); }
+      const target = e.target;
+      const isTextArea = target.tagName === 'TEXTAREA';
+      const isTextInput = target.tagName === 'INPUT' && textInputTypes.includes(target.type);
+      if (isTextInput || isTextArea) {
+        target.inputMode = "none"; 
+        keyboardSystem.activeInput = target;
+        keyboardSystem.show();
+      } else {
+        if (!target.closest('#virtualKeyboard') && !target.closest('.vk-key')) {
+          keyboardSystem.hide();
+        }
+      }
     });
-    document.addEventListener('click', (e) => { if (!e.target.closest('input, textarea, .v-keyboard')) keyboardSystem.hide(); });
   },
   render: () => {
     if (!keyboardSystem.board) return;
@@ -910,10 +919,12 @@ const keyboardSystem = {
   },
   attachEvents: () => {
     keyboardSystem.board.querySelectorAll('.vk-key[data-key]').forEach(k => {
-      const typeAction = (e) => { e.preventDefault(); keyboardSystem.type(k.dataset.key); };
-      k.onmousedown = typeAction; k.ontouchstart = typeAction;
+      k.onmousedown = (e) => { e.preventDefault(); keyboardSystem.type(k.dataset.key); };
     });
-    const bind = (id, fn) => { const el = document.getElementById(id); if (el) { el.onmousedown = (e) => { e.preventDefault(); fn(); }; el.ontouchstart = (e) => { e.preventDefault(); fn(); }; } };
+    const bind = (id, fn) => { 
+      const el = document.getElementById(id); 
+      if (el) el.onmousedown = (e) => { e.preventDefault(); fn(); }; 
+    };
     bind('vkShift', () => {
       const now = Date.now(); const delay = now - keyboardSystem.lastShiftClick;
       if (delay < 300) { keyboardSystem.isCaps = true; keyboardSystem.isShiftTemp = false; }
@@ -926,11 +937,22 @@ const keyboardSystem = {
     if (backBtn) {
       const start = (e) => { e.preventDefault(); keyboardSystem.backspace(); keyboardSystem.delTimer = setTimeout(() => { keyboardSystem.delInterval = setInterval(keyboardSystem.backspace, 50); }, 500); };
       const stop = () => { clearTimeout(keyboardSystem.delTimer); clearInterval(keyboardSystem.delInterval); };
-      backBtn.onmousedown = start; backBtn.ontouchstart = start; backBtn.onmouseup = stop; backBtn.ontouchend = stop; backBtn.onmouseleave = stop;
+      backBtn.onmousedown = start; backBtn.onmouseup = stop; backBtn.onmouseleave = stop;
     }
   },
-  show: () => { keyboardSystem.board.style.display = 'flex'; document.body.classList.add('keyboard-open'); },
-  hide: () => { keyboardSystem.board.style.display = 'none'; document.body.classList.remove('keyboard-open'); if (keyboardSystem.activeInput) keyboardSystem.activeInput.blur(); },
+  show: () => { 
+    if(keyboardSystem.board) {
+        keyboardSystem.board.style.display = 'flex'; 
+        document.body.classList.add('keyboard-open');
+    }
+  },
+  hide: () => { 
+    if(keyboardSystem.board) {
+        keyboardSystem.board.style.display = 'none'; 
+        document.body.classList.remove('keyboard-open'); 
+        if (keyboardSystem.activeInput) keyboardSystem.activeInput.blur(); 
+    }
+  },
   type: (c) => {
     const input = keyboardSystem.activeInput; if (!input) return;
     if (typeof playClick === 'function') playClick();
@@ -941,6 +963,7 @@ const keyboardSystem = {
     input.selectionStart = input.selectionEnd = start + 1;
     if (keyboardSystem.isShiftTemp) { keyboardSystem.isShiftTemp = false; keyboardSystem.render(); }
     input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
   },
   backspace: () => {
     const input = keyboardSystem.activeInput; if (!input) return;
@@ -949,6 +972,7 @@ const keyboardSystem = {
     if (start !== end) { input.value = text.slice(0, start) + text.slice(end); input.selectionStart = input.selectionEnd = start; }
     else if (start > 0) { input.value = text.slice(0, start - 1) + text.slice(start); input.selectionStart = input.selectionEnd = start - 1; }
     input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
   }
 };
 
