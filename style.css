@@ -1911,14 +1911,11 @@ input:checked + .slider:before {
 
 .sys-noti-pill {
     background: rgba(25, 25, 25, 0.95);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
     width: 92%;
     max-width: 380px;
     height: clamp(56px, 9vh, 70px);
-    border-radius: 100px;
+    border-radius: 25px;
     display: flex;
     align-items: center;
     padding: 0 16px;
