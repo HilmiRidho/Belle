@@ -880,19 +880,19 @@ const keyboardSystem = {
   init: () => {
     keyboardSystem.board = document.getElementById('virtualKeyboard'); 
     keyboardSystem.render();
-    document.addEventListener('mousedown', (e) => {
+    document.addEventListener('focusin', (e) => {
       const textInputTypes = ['text', 'password', 'email', 'number', 'search', 'tel', 'url'];
-      const target = e.target;
-      const isTextArea = target.tagName === 'TEXTAREA';
-      const isTextInput = target.tagName === 'INPUT' && textInputTypes.includes(target.type);
-      if (isTextInput || isTextArea) {
-        target.inputMode = "none"; 
-        keyboardSystem.activeInput = target;
-        keyboardSystem.show();
-      } else {
-        if (!target.closest('#virtualKeyboard') && !target.closest('.vk-key')) {
-          keyboardSystem.hide();
-        }
+      const isTextArea = e.target.tagName === 'TEXTAREA';
+      const isTextInput = e.target.tagName === 'INPUT' && textInputTypes.includes(e.target.type);
+      if (isTextInput || isTextArea) { 
+        e.target.inputMode = "none"; 
+        keyboardSystem.activeInput = e.target; 
+        keyboardSystem.show(); 
+      }
+    });
+    document.addEventListener('mousedown', (e) => { 
+      if (!e.target.closest('input, textarea, #virtualKeyboard, .vk-key')) {
+        keyboardSystem.hide(); 
       }
     });
   },
@@ -919,11 +919,15 @@ const keyboardSystem = {
   },
   attachEvents: () => {
     keyboardSystem.board.querySelectorAll('.vk-key[data-key]').forEach(k => {
-      k.onmousedown = (e) => { e.preventDefault(); keyboardSystem.type(k.dataset.key); };
+      const typeAction = (e) => { e.preventDefault(); keyboardSystem.type(k.dataset.key); };
+      k.onmousedown = typeAction; k.ontouchstart = typeAction;
     });
     const bind = (id, fn) => { 
       const el = document.getElementById(id); 
-      if (el) el.onmousedown = (e) => { e.preventDefault(); fn(); }; 
+      if (el) { 
+        el.onmousedown = (e) => { e.preventDefault(); fn(); }; 
+        el.ontouchstart = (e) => { e.preventDefault(); fn(); }; 
+      } 
     };
     bind('vkShift', () => {
       const now = Date.now(); const delay = now - keyboardSystem.lastShiftClick;
@@ -937,22 +941,11 @@ const keyboardSystem = {
     if (backBtn) {
       const start = (e) => { e.preventDefault(); keyboardSystem.backspace(); keyboardSystem.delTimer = setTimeout(() => { keyboardSystem.delInterval = setInterval(keyboardSystem.backspace, 50); }, 500); };
       const stop = () => { clearTimeout(keyboardSystem.delTimer); clearInterval(keyboardSystem.delInterval); };
-      backBtn.onmousedown = start; backBtn.onmouseup = stop; backBtn.onmouseleave = stop;
+      backBtn.onmousedown = start; backBtn.ontouchstart = start; backBtn.onmouseup = stop; backBtn.ontouchend = stop; backBtn.onmouseleave = stop;
     }
   },
-  show: () => { 
-    if(keyboardSystem.board) {
-        keyboardSystem.board.style.display = 'flex'; 
-        document.body.classList.add('keyboard-open');
-    }
-  },
-  hide: () => { 
-    if(keyboardSystem.board) {
-        keyboardSystem.board.style.display = 'none'; 
-        document.body.classList.remove('keyboard-open'); 
-        if (keyboardSystem.activeInput) keyboardSystem.activeInput.blur(); 
-    }
-  },
+  show: () => { keyboardSystem.board.style.display = 'flex'; document.body.classList.add('keyboard-open'); },
+  hide: () => { keyboardSystem.board.style.display = 'none'; document.body.classList.remove('keyboard-open'); if (keyboardSystem.activeInput) keyboardSystem.activeInput.blur(); },
   type: (c) => {
     const input = keyboardSystem.activeInput; if (!input) return;
     if (typeof playClick === 'function') playClick();
