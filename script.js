@@ -1036,6 +1036,7 @@ const keyboardSystem = {
     input.focus();
   }
 };
+window.keyboardSystem = keyboardSystem;
 
 const notepadApp = {
   currentTab: 'html',
