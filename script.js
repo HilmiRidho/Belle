@@ -1164,22 +1164,16 @@ window.viewerApp = viewerApp;
 
 window.triggerSystemNotification = (user, msg, icon = 'Messenger.png') => {
     const overlay = document.getElementById('sys-overlay');
-    if (!overlay) return;
-    
     document.getElementById('sys-noti-user').innerText = user;
     document.getElementById('sys-noti-text').innerText = msg;
     document.getElementById('sys-noti-img').src = `icons/${icon}`;
+
     
     overlay.classList.add('show');
     if (!isMuted) new Audio('pop.ogg').play();
 
-    if (window.notiTimer) clearTimeout(window.notiTimer);
-    window.notiTimer = setTimeout(() => {
+
+    setTimeout(() => {
         overlay.classList.remove('show');
     }, 4500);
-};
-
-window.hideSystemNotification = () => {
-    const overlay = document.getElementById('sys-overlay');
-    if (overlay) overlay.classList.remove('show');
 };
