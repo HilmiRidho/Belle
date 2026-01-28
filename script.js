@@ -1004,45 +1004,27 @@ const keyboardSystem = {
   hide: () => { keyboardSystem.board.style.display = 'none'; document.body.classList.remove('keyboard-open'); if (keyboardSystem.activeInput) keyboardSystem.activeInput.blur(); },
   
   type: (c) => {
-  if (typeof playClick === 'function') playClick();
+    const input = keyboardSystem.activeInput; if (!input) return;
+    if (typeof playClick === 'function') playClick();
 
-  const vf = document.getElementById('viewerFrame');
-  if (vf && vf.contentWindow) {
-    vf.contentWindow.postMessage({ 
-      source: 'BELLE_OS', 
-      type: 'BELLE_PAD_SIGNAL', 
-      key: c 
-    }, '*');
-  }
+    if (c === "\n") {
+      const enterEv = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+      input.dispatchEvent(enterEv);
+      
+      if (input.tagName !== 'TEXTAREA') return; 
+    }
 
-  const input = keyboardSystem.activeInput;
-  if (!input) return; 
-
-  const start = input.selectionStart;
-  const end = input.selectionEnd;
-  const text = input.value;
-
-  if (c === "\n") {
-    const enterEv = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
-    input.dispatchEvent(enterEv);
+    const start = input.selectionStart, end = input.selectionEnd, text = input.value;
+    const isUpper = (keyboardSystem.isCaps || keyboardSystem.isShiftTemp) && !keyboardSystem.isSym && !keyboardSystem.isPad;
+    const char = isUpper ? c.toUpperCase() : c;
     
-    if (input.tagName !== 'TEXTAREA') return; 
-  }
-
-  const isUpper = (keyboardSystem.isCaps || keyboardSystem.isShiftTemp) && !keyboardSystem.isSym && !keyboardSystem.isPad;
-  const char = isUpper ? c.toUpperCase() : c;
-
-  input.value = text.slice(0, start) + char + text.slice(end);
-  input.selectionStart = input.selectionEnd = start + 1;
-
-  if (keyboardSystem.isShiftTemp) { 
-    keyboardSystem.isShiftTemp = false; 
-    keyboardSystem.render(); 
-  }
-
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-  input.focus();
-},
+    input.value = text.slice(0, start) + char + text.slice(end);
+    input.selectionStart = input.selectionEnd = start + 1;
+    
+    if (keyboardSystem.isShiftTemp) { keyboardSystem.isShiftTemp = false; keyboardSystem.render(); }
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
+  },
 
   backspace: () => {
     const input = keyboardSystem.activeInput; if (!input) return;
