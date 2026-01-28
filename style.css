@@ -1891,3 +1891,59 @@ input:checked + .slider:before {
     margin: 0 !important;
     cursor: pointer !important;
 }
+
+.sys-noti-overlay {
+    position: fixed;
+    top: -120px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 5000;
+    transition: transform 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    pointer-events: none;
+}
+
+.sys-noti-overlay.show {
+    transform: translateY(calc(120px + var(--topbar-h) + 8px));
+    pointer-events: auto;
+}
+
+.sys-noti-pill {
+    background: rgba(25, 25, 25, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
+    width: 92%;
+    max-width: 380px;
+    height: clamp(56px, 9vh, 70px);
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    cursor: pointer;
+}
+
+.sys-noti-icon {
+    width: clamp(36px, 6.5vh, 46px);
+    height: clamp(36px, 6.5vh, 46px);
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.sys-noti-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+.sys-noti-title {
+    font-weight: bold;
+    font-size: clamp(12px, 2.2vh, 14px);
+    color: var(--accent-color);
+}
+
+.sys-noti-text {
+    font-size: clamp(11px, 1.8vh, 12px);
+    color: #eee;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
