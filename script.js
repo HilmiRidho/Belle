@@ -1035,13 +1035,6 @@ function setupGlobalEvents() {
     };
   }
 
-  const searchInput = document.getElementById("search");
-  if (searchInput) {
-    searchInput.oninput = e => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('.app').forEach(a => { a.style.display = a.dataset.name.includes(q) ? "" : "none"; });
-    };
-  }
   document.addEventListener("contextmenu", e => {
     if (e.target.closest('#fmContent')) {
       e.preventDefault();
@@ -1053,13 +1046,17 @@ function setupGlobalEvents() {
       return;
     }
   });
+
   document.addEventListener('click', () => { if (typeof playClick === 'function') playClick(); });
+
   const menu = document.getElementById("contextMenu");
   document.addEventListener("contextmenu", e => {
     if (e.target.closest('.app') || e.target.closest('#msgList') || windowOps.isAnyOpen()) return;
     e.preventDefault(); if (menu) { menu.style.display = "block"; menu.style.left = e.pageX + "px"; menu.style.top = e.pageY + "px"; }
   });
+
   document.addEventListener("click", () => { if (menu) menu.style.display = "none"; });
+
   const searchInput = document.getElementById("search");
   if (searchInput) {
     searchInput.oninput = e => {
@@ -1067,6 +1064,7 @@ function setupGlobalEvents() {
       document.querySelectorAll('.app').forEach(a => { a.style.display = a.dataset.name.includes(q) ? "" : "none"; });
     };
   }
+
   const changeBgBtn = document.getElementById("changeBg");
   if (changeBgBtn) {
     changeBgBtn.onclick = () => document.getElementById("bgInput").click();
