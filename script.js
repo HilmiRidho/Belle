@@ -876,7 +876,16 @@ const musicApp = {
 window.musicApp = musicApp;
 
 const keyboardSystem = {
-  activeInput: null, isCaps: false, isShiftTemp: false, isSym: false, lastShiftClick: 0, delInterval: null, delTimer: null, board: null,
+  activeInput: null, 
+  isCaps: false, 
+  isShiftTemp: false, 
+  isSym: false, 
+  isPad: false, 
+  lastShiftClick: 0, 
+  delInterval: null, 
+  delTimer: null, 
+  board: null,
+
   init: () => {
     keyboardSystem.board = document.getElementById('virtualKeyboard'); 
     keyboardSystem.render();
@@ -896,32 +905,56 @@ const keyboardSystem = {
       }
     });
   },
+
   render: () => {
     if (!keyboardSystem.board) return;
+    
     const abc = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'], ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'], ['z', 'x', 'c', 'v', 'b', 'n', 'm']];
-    const sym = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'], ['@', '#', '$', '_', '&', '-', '+', '(', ')', '/'], ['.', '*', ',', '?', '!', '\'', '"', '<', '>', ':', ';']];
-    const layout = keyboardSystem.isSym ? sym : abc;
-    const isUpper = (keyboardSystem.isCaps || keyboardSystem.isShiftTemp) && !keyboardSystem.isSym;
+    const sym = [['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'], ['@', '#', '$', '_', '&', '-', '+', '(', ')', '/'], ['*', ',', '?', '!', '\'', '"', '<', '>', ':', ';', '.']];
+    const pad = [['L1', 'L2', 'UP', 'R2', 'R1'], ['LEFT', 'DOWN', 'RIGHT'], ['X', 'Y', 'A', 'B', 'SEL', 'STA']];
+
+    let layout = abc;
+    if (keyboardSystem.isPad) layout = pad;
+    else if (keyboardSystem.isSym) layout = sym;
+
+    const isUpper = (keyboardSystem.isCaps || keyboardSystem.isShiftTemp) && !keyboardSystem.isSym && !keyboardSystem.isPad;
+    
     let h = '<div class="vk-row">';
     layout[0].forEach(k => h += `<div class="vk-key" data-key="${k}">${isUpper ? k.toUpperCase() : k}</div>`);
+    
     h += '</div><div class="vk-row" style="padding:0 15px">';
     layout[1].forEach(k => h += `<div class="vk-key" data-key="${k}">${isUpper ? k.toUpperCase() : k}</div>`);
+    
     h += '</div><div class="vk-row">';
-    if (!keyboardSystem.isSym) {
+    
+    if (!keyboardSystem.isSym && !keyboardSystem.isPad) {
       const shiftClass = keyboardSystem.isCaps ? 'active locked' : (keyboardSystem.isShiftTemp ? 'active' : '');
       const shiftIcon = keyboardSystem.isCaps ? 'Caps' : 'Shift';
       h += `<div class="vk-key wide action ${shiftClass}" id="vkShift">${shiftIcon}</div>`;
     }
+    
     layout[2].forEach(k => h += `<div class="vk-key" data-key="${k}">${isUpper ? k.toUpperCase() : k}</div>`);
     h += `<div class="vk-key wide action" id="vkBack">Del</div></div><div class="vk-row">`;
-    h += `<div class="vk-key wide action" id="vkMode">${keyboardSystem.isSym ? 'ABC' : '?123'}</div><div class="vk-key space" data-key=" "></div><div class="vk-key wide action" id="vkDone">Done</div></div>`;
-    keyboardSystem.board.innerHTML = h; keyboardSystem.attachEvents();
+    
+    let modeLabel = '?123';
+    if (keyboardSystem.isSym) modeLabel = 'PAD';
+    else if (keyboardSystem.isPad) modeLabel = 'ABC';
+    
+    h += `<div class="vk-key wide action" id="vkMode">${modeLabel}</div>`;
+    h += `<div class="vk-key space" data-key=" "></div>`;
+    h += `<div class="vk-key wide action" data-key="\n">Enter</div>`;
+    h += `<div class="vk-key wide action" id="vkDone">Done</div></div>`;
+    
+    keyboardSystem.board.innerHTML = h; 
+    keyboardSystem.attachEvents();
   },
+
   attachEvents: () => {
     keyboardSystem.board.querySelectorAll('.vk-key[data-key]').forEach(k => {
       const typeAction = (e) => { e.preventDefault(); keyboardSystem.type(k.dataset.key); };
       k.onmousedown = typeAction; k.ontouchstart = typeAction;
     });
+
     const bind = (id, fn) => { 
       const el = document.getElementById(id); 
       if (el) { 
@@ -929,39 +962,74 @@ const keyboardSystem = {
         el.ontouchstart = (e) => { e.preventDefault(); fn(); }; 
       } 
     };
-    bind('vkShift', () => {
-      const now = Date.now(); const delay = now - keyboardSystem.lastShiftClick;
-      if (delay < 300) { keyboardSystem.isCaps = true; keyboardSystem.isShiftTemp = false; }
-      else { if (keyboardSystem.isCaps) { keyboardSystem.isCaps = false; keyboardSystem.isShiftTemp = false; } else { keyboardSystem.isShiftTemp = !keyboardSystem.isShiftTemp; } }
-      keyboardSystem.lastShiftClick = now; keyboardSystem.render();
+
+    bind('vkMode', () => {
+      if (!keyboardSystem.isSym && !keyboardSystem.isPad) {
+        keyboardSystem.isSym = true;
+      } else if (keyboardSystem.isSym) {
+        keyboardSystem.isSym = false;
+        keyboardSystem.isPad = true;
+      } else {
+        keyboardSystem.isPad = false;
+      }
+      keyboardSystem.render();
     });
-    bind('vkMode', () => { keyboardSystem.isSym = !keyboardSystem.isSym; keyboardSystem.render(); });
+
+    bind('vkShift', () => {
+      const now = Date.now(); 
+      if (now - keyboardSystem.lastShiftClick < 300) { 
+        keyboardSystem.isCaps = true; keyboardSystem.isShiftTemp = false; 
+      } else { 
+        if (keyboardSystem.isCaps) { keyboardSystem.isCaps = false; } 
+        else { keyboardSystem.isShiftTemp = !keyboardSystem.isShiftTemp; } 
+      }
+      keyboardSystem.lastShiftClick = now; 
+      keyboardSystem.render();
+    });
+
     bind('vkDone', keyboardSystem.hide);
+
     const backBtn = document.getElementById('vkBack');
     if (backBtn) {
-      const start = (e) => { e.preventDefault(); keyboardSystem.backspace(); keyboardSystem.delTimer = setTimeout(() => { keyboardSystem.delInterval = setInterval(keyboardSystem.backspace, 50); }, 500); };
+      const start = (e) => { 
+        e.preventDefault(); keyboardSystem.backspace(); 
+        keyboardSystem.delTimer = setTimeout(() => { keyboardSystem.delInterval = setInterval(keyboardSystem.backspace, 50); }, 500); 
+      };
       const stop = () => { clearTimeout(keyboardSystem.delTimer); clearInterval(keyboardSystem.delInterval); };
-      backBtn.onmousedown = start; backBtn.ontouchstart = start; backBtn.onmouseup = stop; backBtn.ontouchend = stop; backBtn.onmouseleave = stop;
+      backBtn.onmousedown = start; backBtn.ontouchstart = start; backBtn.onmouseup = stop; backBtn.ontouchend = stop;
     }
   },
+
   show: () => { keyboardSystem.board.style.display = 'flex'; document.body.classList.add('keyboard-open'); },
   hide: () => { keyboardSystem.board.style.display = 'none'; document.body.classList.remove('keyboard-open'); if (keyboardSystem.activeInput) keyboardSystem.activeInput.blur(); },
+  
   type: (c) => {
     const input = keyboardSystem.activeInput; if (!input) return;
     if (typeof playClick === 'function') playClick();
-    const start = input.selectionStart; const end = input.selectionEnd; const text = input.value;
-    const isUpper = (keyboardSystem.isCaps || keyboardSystem.isShiftTemp) && !keyboardSystem.isSym;
+
+    if (c === "\n") {
+      const enterEv = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+      input.dispatchEvent(enterEv);
+      
+      if (input.tagName !== 'TEXTAREA') return; 
+    }
+
+    const start = input.selectionStart, end = input.selectionEnd, text = input.value;
+    const isUpper = (keyboardSystem.isCaps || keyboardSystem.isShiftTemp) && !keyboardSystem.isSym && !keyboardSystem.isPad;
     const char = isUpper ? c.toUpperCase() : c;
+    
     input.value = text.slice(0, start) + char + text.slice(end);
     input.selectionStart = input.selectionEnd = start + 1;
+    
     if (keyboardSystem.isShiftTemp) { keyboardSystem.isShiftTemp = false; keyboardSystem.render(); }
     input.dispatchEvent(new Event('input', { bubbles: true }));
     input.focus();
   },
+
   backspace: () => {
     const input = keyboardSystem.activeInput; if (!input) return;
     if (typeof playClick === 'function') playClick();
-    const start = input.selectionStart; const end = input.selectionEnd; const text = input.value;
+    const start = input.selectionStart, end = input.selectionEnd, text = input.value;
     if (start !== end) { input.value = text.slice(0, start) + text.slice(end); input.selectionStart = input.selectionEnd = start; }
     else if (start > 0) { input.value = text.slice(0, start - 1) + text.slice(start); input.selectionStart = input.selectionEnd = start - 1; }
     input.dispatchEvent(new Event('input', { bubbles: true }));
