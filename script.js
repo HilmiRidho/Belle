@@ -137,19 +137,35 @@ const uiSystem = {
     CONFIG.icons.forEach(f => {
       const name = f.replace(".png", "").replace(/_/g, " ");
       const el = document.createElement("div");
+      const icon = document.createElement("img");
+      const label = document.createElement("div");
       el.className = "app";
       el.dataset.name = name.toLowerCase();
-      el.innerHTML = `<img src="icons/${f}" alt="${name}" onerror="this.src='icons/File.png'"><div class="label">${name}</div>`;
+      icon.src = `icons/${f}`;
+      icon.alt = name;
+      icon.onerror = () => { icon.src = 'icons/File.png'; };
+      label.className = "label";
+      label.textContent = name;
+      el.appendChild(icon);
+      el.appendChild(label);
       el.onclick = () => uiSystem.handleAppClick(name.toLowerCase());
       drawer.appendChild(el);
     });
 
     window.customApps.forEach(appData => {
       const el = document.createElement("div");
+      const icon = document.createElement("img");
+      const label = document.createElement("div");
+      const iconSrc = appData.icon || "icons/File.png";
       el.className = "app";
       el.dataset.name = appData.name.toLowerCase();
-      const iconSrc = appData.icon || "icons/File.png";
-      el.innerHTML = `<img src="${iconSrc}" onerror="this.src='icons/File.png'" style="border-radius:10px;"><div class="label">${appData.name}</div>`;
+      icon.src = iconSrc;
+      icon.style.borderRadius = "10px";
+      icon.onerror = () => { icon.src = 'icons/File.png'; };
+      label.className = "label";
+      label.textContent = appData.name;
+      el.appendChild(icon);
+      el.appendChild(label);
       el.onclick = () => viewerApp.launch(appData);
       drawer.appendChild(el);
     });
@@ -357,18 +373,66 @@ const appManagerApp = {
     CONFIG.icons.forEach(f => {
       const n = f.replace(".png", "").replace(/_/g, " ");
       const div = document.createElement("div");
+      const img = document.createElement("img");
+      const info = document.createElement("div");
+      const name = document.createElement("div");
+      const size = document.createElement("div");
       div.className = "am-item";
-      div.innerHTML = `<img src="icons/${f}" class="am-icon" onerror="this.src='icons/File.png'"><div class="am-info"><div class="am-name">${n}</div><div class="am-size">System App</div></div>`;
+      img.src = `icons/${f}`;
+      img.className = "am-icon";
+      img.onerror = () => { img.src = 'icons/File.png'; };
+      info.className = "am-info";
+      name.className = "am-name";
+      name.textContent = n;
+      size.className = "am-size";
+      size.textContent = "System App";
+      info.appendChild(name);
+      info.appendChild(size);
+      div.appendChild(img);
+      div.appendChild(info);
       list.appendChild(div);
     });
     if (window.customApps && window.customApps.length > 0) {
       window.customApps.forEach(app => {
         const div = document.createElement("div");
-        div.className = "am-item";
+        const img = document.createElement("img");
+        const info = document.createElement("div");
+        const name = document.createElement("div");
+        const size = document.createElement("div");
         const currentUser = localStorage.getItem('chat_username') || "Guest";
         const isOwner = app.creator === currentUser || currentUser === "admin";
-        const deleteBtn = isOwner ? `<button onclick="createApp.deleteApp('${app.id}'); setTimeout(appManagerApp.render, 500);" style="background:#ff4444; color:white; border:none; padding:5px 10px; border-radius:5px; font-size:11px; cursor:pointer;">Uninstall</button>` : ``;
-        div.innerHTML = `<img src="${app.icon || 'icons/File.png'}" class="am-icon" onerror="this.src='icons/File.png'" style="border-radius:8px;"><div class="am-info" style="flex:1;"><div class="am-name">${app.name}</div><div class="am-size" style="color:var(--accent-color);">User App (by ${app.creator})</div></div>${deleteBtn}`;
+        div.className = "am-item";
+        img.src = app.icon || 'icons/File.png';
+        img.className = "am-icon";
+        img.style.borderRadius = "8px";
+        img.onerror = () => { img.src = 'icons/File.png'; };
+        info.className = "am-info";
+        info.style.flex = "1";
+        name.className = "am-name";
+        name.textContent = app.name;
+        size.className = "am-size";
+        size.style.color = "var(--accent-color)";
+        size.textContent = `User App (by ${app.creator})`;
+        info.appendChild(name);
+        info.appendChild(size);
+        div.appendChild(img);
+        div.appendChild(info);
+        if (isOwner) {
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "Uninstall";
+          deleteButton.style.background = "#ff4444";
+          deleteButton.style.color = "white";
+          deleteButton.style.border = "none";
+          deleteButton.style.padding = "5px 10px";
+          deleteButton.style.borderRadius = "5px";
+          deleteButton.style.fontSize = "11px";
+          deleteButton.style.cursor = "pointer";
+          deleteButton.onclick = () => {
+            createApp.deleteApp(app.id);
+            setTimeout(appManagerApp.render, 500);
+          };
+          div.appendChild(deleteButton);
+        }
         list.appendChild(div);
       });
     }
@@ -1201,9 +1265,25 @@ const createApp = {
     list.innerHTML = ""; const currentUser = localStorage.getItem('chat_username') || "Guest";
     window.customApps.forEach(app => {
       const isOwner = app.creator === currentUser || currentUser === "admin";
-      const item = document.createElement('div'); item.className = 'custom-app-item';
-      item.innerHTML = `<div><strong>${app.name}</strong> <span style="font-size:10px;">by ${app.creator}</span></div>${isOwner ? `<button class="btn-delete-app">Delete</button>` : ''}`;
-      if (isOwner) item.querySelector('.btn-delete-app').onclick = () => createApp.deleteApp(app.id);
+      const item = document.createElement('div');
+      const info = document.createElement('div');
+      const name = document.createElement('strong');
+      const creator = document.createElement('span');
+      item.className = 'custom-app-item';
+      creator.style.fontSize = "10px";
+      name.textContent = app.name;
+      creator.textContent = `by ${app.creator}`;
+      info.appendChild(name);
+      info.appendChild(document.createTextNode(" "));
+      info.appendChild(creator);
+      item.appendChild(info);
+      if (isOwner) {
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn-delete-app';
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = () => createApp.deleteApp(app.id);
+        item.appendChild(deleteButton);
+      }
       list.appendChild(item);
     });
   },
