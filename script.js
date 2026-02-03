@@ -255,7 +255,8 @@ const settingsApp = {
   changeUsername: () => {
     const currentName = localStorage.getItem('chat_username') || "";
     const input = document.getElementById('usernameCustomInput');
-    if (input) input.value = currentName;
+    if (input) input.value = currentName; input.inputMode = "none";
+    }
     const overlay = document.getElementById('clickOverlay');
     const modal = document.getElementById('usernameModal');
     if (overlay && modal) {
@@ -732,12 +733,15 @@ const messengerApp = {
       document.getElementById('clickOverlay').style.display = 'block';
       document.getElementById('usernameModal').style.display = 'flex';
       setTimeout(() => document.getElementById('usernameCustomInput').focus(), 100);
-    }
-  },
-  cancel: () => {
-    document.getElementById('clickOverlay').style.display = 'none';
-    document.getElementById('usernameModal').style.display = 'none';
-  },
+      if (input) input.inputMode = "none";
+      
+      document.getElementById('clickOverlay').style.display = 'none';
+      document.getElementById('usernameModal').style.display = 'none';
+      setTimeout(() => {
+      if (input) input.focus();
+    }, 100);
+  }
+},
   saveUsername: () => {
     let name = document.getElementById('usernameCustomInput').value.trim();
     if (name.length === 0) name = "Guest";
