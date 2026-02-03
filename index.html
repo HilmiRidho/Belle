@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Belle</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="sys-overlay" class="sys-noti-overlay">
+  <div class="sys-noti-pill" onclick="this.parentElement.classList.remove('show')">
+    <div class="sys-noti-icon">
+      <img id="sys-noti-img" src="icons/Messenger.png" alt="icon">
+    </div>
+    <div class="sys-noti-content">
+      <div id="sys-noti-user" class="sys-noti-title">Messenger</div>
+      <div id="sys-noti-text" class="sys-noti-text">Pesan baru diterima</div>
+    </div>
+  </div>
+</div>
+  <div class="topbar"></div>
+
+  <header class="header">
+    <div class="title">
+      <span class="title-pill">Belle</span>
+    </div>
+    <div class="search">
+      <input id="search" type="text" placeholder="Search application" inputmode="none" autocomplete="off">
+    </div>
+    <div class="clock">
+      <span id="clock" class="clock-pill">00:00</span>
+    </div>
+  </header>
+
+  <main class="drawer" id="drawer"></main>
+
+  <nav class="taskbar">
+    <img src="icons/Contact.png" onclick="uiSystem.handleAppClick('contact')">
+    <img src="icons/Messenger.png" onclick="uiSystem.handleAppClick('messenger')">
+    <img src="icons/Music.png" onclick="uiSystem.handleAppClick('music')">
+    <img src="icons/Maps.png" onclick="uiSystem.handleAppClick('maps')">
+    <img src="icons/Network.png" onclick="uiSystem.handleAppClick('network')">
+  </nav>
+
+  <div id="appManagerWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/App_Manager.png" alt="icon"> App Manager</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('appManagerWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('appManagerWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content padded">
+      <div class="am-list" id="appListContainer"></div>
+    </div>
+  </div>
+
+  <div id="calendarWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Calendar.png" alt="icon"> Calendar</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('calendarWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('calendarWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content padded">
+      <div class="cal-wrapper">
+        <div class="cal-header-text" id="calMonthYear"></div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="compassWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Compass.png" alt="icon"> Compass</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('compassWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('compassWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content">
+      <div class="compass-container">
+        <div class="compass-indicator"></div>
+        <div class="compass-dial-wrap">
+          <div id="compassDial" class="compass-dial"></div>
+        </div>
+        <div class="compass-readout" id="compassDegree">0°</div>
+        <div class="compass-sub" id="compassDirection">North</div>
+        <button class="compass-btn" id="btnCompass">Enable Compass</button>
+        <button class="compass-btn" id="btnDisableCompass" style="display:none; background: #ff4444; border-color: #800000; margin-top: 10px;">Disable Compass</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="contactWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Contact.png" alt="icon"> Contacts</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('contactWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('contactWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content">
+      <div id="contactListView">
+        <div class="contact-list" id="contactListContainer"></div>
+        <div class="fab-add" onclick="contactApp.showForm()">+</div>
+      </div>
+      <div id="contactFormView" class="contact-form-view">
+        <h3>Add Contact</h3>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="cInputName" class="form-input" placeholder="Ex: John Doe" inputmode="none" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="cInputPhone" class="form-input" placeholder="Ex: 08123456789" inputmode="none" autocomplete="off">
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="contactApp.hideForm()">Cancel</button>
+          <button class="btn-save" onclick="contactApp.save()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="converterWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Converter.png" alt="icon"> Converter</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('converterWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('converterWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content">
+      <div class="conv-tabs">
+        <div class="conv-tab active" onclick="converterApp.switchTab('unit')">Unit</div>
+        <div class="conv-tab" onclick="converterApp.switchTab('currency')">Currency</div>
+      </div>
+      <div id="tabUnit" class="conv-body show">
+        <div class="conv-group">
+          <label class="conv-label">Category</label>
+          <select class="conv-select" id="unitCategory" onchange="converterApp.updateOptions()">
+            <option value="length">Length</option>
+            <option value="weight">Weight</option>
+            <option value="temp">Temperature</option>
+          </select>
+        </div>
+        <div class="conv-group">
+          <label class="conv-label">From</label>
+          <div class="conv-row">
+            <input type="text" id="unitInput" class="conv-input" value="1" oninput="converterApp.calcUnit()" inputmode="none" autocomplete="off">
+            <select id="unitFrom" class="conv-select" onchange="converterApp.calcUnit()"></select>
+          </div>
+        </div>
+        <div class="conv-divider">=</div>
+        <div class="conv-group">
+          <label class="conv-label">To</label>
+          <div class="conv-row">
+            <input type="text" id="unitOutput" class="conv-input" readonly>
+            <select id="unitTo" class="conv-select" onchange="converterApp.calcUnit()"></select>
+          </div>
+        </div>
+      </div>
+      <div id="tabCurrency" class="conv-body">
+        <div class="conv-group">
+          <label class="conv-label">Amount</label>
+          <div class="conv-row">
+            <input type="text" id="currInput" class="conv-input" value="1" oninput="converterApp.calcCurr()" inputmode="none" autocomplete="off">
+            <select id="currFrom" class="conv-select" onchange="converterApp.calcCurr()">
+              <option value="USD">USD - US Dollar</option>
+              <option value="IDR">IDR - Indonesian Rupiah</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="JPY">JPY - Japanese Yen</option>
+              <option value="SGD">SGD - Singapore Dollar</option>
+            </select>
+          </div>
+        </div>
+        <div class="conv-divider">=</div>
+        <div class="conv-group">
+          <label class="conv-label">Converted</label>
+          <div class="conv-row">
+            <input type="text" id="currOutput" class="conv-input" readonly>
+            <select id="currTo" class="conv-select" onchange="converterApp.calcCurr()">
+              <option value="IDR">IDR - Indonesian Rupiah</option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="JPY">JPY - Japanese Yen</option>
+              <option value="SGD">SGD - Singapore Dollar</option>
+            </select>
+          </div>
+        </div>
+        <div class="conv-note">Rates are simulated/static.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fileManagerWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/File_Manager.png" alt="icon"> File Manager</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('fileManagerWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('fileManagerWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="fm-toolbar">
+      <button class="fm-up-btn" onclick="fileManagerApp.goUp()">⬆</button>
+      <div class="fm-path" id="fmPath">/</div>
+    </div>
+    <div class="app-content">
+      <div class="fm-grid" id="fmContent"></div>
+    </div>
+  </div>
+
+  <div id="galleryWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Gallery.png" alt="icon"> Gallery</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('galleryWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('galleryWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content" style="position: relative; overflow: hidden;">
+      <div id="galleryListView" style="height: 100%; overflow-y: auto;">
+        <div class="gal-grid" id="galleryContent"></div>
+      </div>
+      <div id="photoViewer" style="display:none; position: absolute; top:0; left:0; width:100%; height:100%; background:#000; flex-direction:column; z-index: 5;">
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;">
+          <img id="viewedPhoto" src="" style="max-width:100%; max-height:100%; transition: transform 0.2s ease; cursor: grab;">
+        </div>
+        <div class="zoom-controls" style="padding:15px; display:flex; gap:20px; justify-content:center; background:rgba(0,0,0,0.8); border-top: 1px solid #333;">
+          <button onclick="galleryApp.zoom(-0.2)" style="width:40px; height:40px; border-radius:50%; border:1px solid #555; background:#222; color:#fff; font-size:20px;">-</button>
+          <span id="zoomVal" style="font-size:14px; color:#fff; align-self:center; font-family:monospace; min-width:50px; text-align:center;">100%</span>
+          <button onclick="galleryApp.zoom(0.2)" style="width:40px; height:40px; border-radius:50%; border:1px solid #555; background:#222; color:#fff; font-size:20px;">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="gamesWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Games.png" alt="icon"> Games</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('gamesWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('gamesWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content no-scroll">
+      <iframe src="https://gba.js.org/" class="iframe-view"></iframe>
+    </div>
+  </div>
+
+  <div id="mapsWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Maps.png" alt="icon"> Maps</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('mapsWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('mapsWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content">
+      <div id="mapsMenu" class="maps-menu">
+        <div class="map-btn" onclick="mapsApp.load('google')">Google Maps</div>
+        <div class="map-btn" onclick="mapsApp.load('osm')">OpenStreetMap</div>
+        <div class="map-btn" onclick="mapsApp.load('bing')">Bing Maps</div>
+        <div class="map-btn" onclick="mapsApp.load('yandex')">Yandex Maps</div>
+      </div>
+      <div id="mapsView" class="maps-view-container">
+        <iframe id="mapFrame" class="iframe-view" allow="geolocation"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div id="messengerWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Messenger.png" alt="icon"> Messenger</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('messengerWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('messengerWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content">
+      <div class="msg-content">
+        <div class="msg-list" id="msgList"></div>
+        <div class="msg-input-area">
+          <input type="file" id="msgFilePicker" hidden>
+          <img src="icons/send_files.png" class="msg-icon-btn" onclick="messengerApp.pickFile('*')">
+          <input type="text" id="msgInput" class="msg-input" placeholder="Type a message..." inputmode="none">
+          <button class="msg-btn" onclick="messengerApp.send()">Enter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="musicWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Music.png" alt="icon"> Music</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('musicWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('musicWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content music-layout">
+      <div class="music-list-container" id="musicList"></div>
+      <div class="music-player-bar">
+        <div class="mp-info">
+          <div id="mpTitle" class="mp-title">No music selected</div>
+          <div id="mpTime" class="mp-time">00:00 / 00:00</div>
+        </div>
+        <input type="range" id="mpProgress" class="mp-progress" value="0" min="0" step="1" oninput="musicApp.seek()">
+        <div class="mp-controls">
+          <button class="mp-btn" onclick="musicApp.prev()">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button class="mp-btn big" id="mpPlayBtn" onclick="musicApp.togglePlay()">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button class="mp-btn" onclick="musicApp.next()">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="networkWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Network.png" alt="icon"> Network</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('networkWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('networkWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content net-layout">
+      <div class="net-speed-section">
+        <div class="net-gauge-wrap">
+          <div class="net-gauge" id="netGauge">
+            <div class="net-gauge-center">
+              <div class="net-val" id="netSpeedVal">0.0</div>
+              <div class="net-unit">Mbps</div>
+              <div class="net-label" id="netStatus">READY</div>
+            </div>
+          </div>
+        </div>
+        <div class="net-controls" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+          <button class="net-start-btn" onclick="networkApp.startTest()">TEST</button>
+          <button class="net-stop-btn" onclick="networkApp.stopTest()" style="display:none;">STOP</button>
+        </div>
+      </div>
+      <div class="net-results">
+        <div class="net-res-item"><span class="net-res-label">DOWNLOAD</span><span class="net-res-val" id="valDown">-</span></div>
+        <div class="net-res-item"><span class="net-res-label">UPLOAD</span><span class="net-res-val" id="valUp">-</span></div>
+        <div class="net-res-item"><span class="net-res-label">PING</span><span class="net-res-val" id="valPing">-</span></div>
+      </div>
+      <div class="net-info-grid">
+        <div class="net-card"><div class="nc-data"><div class="nc-val" id="netIP">Checking...</div><div class="nc-lbl">Public IP</div></div></div>
+        <div class="net-card"><div class="nc-data"><div class="nc-val" id="netISP">Checking...</div><div class="nc-lbl">Provider / ISP</div></div></div>
+        <div class="net-card"><div class="nc-data"><div class="nc-val" id="netLoc">Checking...</div><div class="nc-lbl">Location</div></div></div>
+        <div class="net-card"><div class="nc-data"><div class="nc-val" id="netType">Checking...</div><div class="nc-lbl">Connection Type</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="browserWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Browser.png" alt="icon"> Browser</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('browserWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('browserWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content no-scroll">
+      <iframe src="https://hilmiridho.github.io/Belle/index.html" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+  </div>
+
+  <div id="notepadWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Notepad.png" alt="icon"> Inspector</div>
+      <div class="window-controls">
+        <button class="btn-save" style="background:#444; padding:5px 10px; border-radius:5px;" onclick="notepadApp.applyChanges()">Apply</button>
+        <button class="close-btn" onclick="windowOps.close('notepadWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content no-scroll" style="display: flex; flex-direction: column; background:#111;">
+      <div class="conv-tabs">
+        <div id="tabHtmlBtn" class="conv-tab active" onclick="notepadApp.switchTab('html')">HTML</div>
+        <div id="tabCssBtn" class="conv-tab" onclick="notepadApp.switchTab('css')">CSS</div>
+        <div id="tabJsBtn" class="conv-tab" onclick="notepadApp.switchTab('js')">JS</div>
+      </div>
+      <textarea id="notepadEditor" class="editor-area" inputmode="none"></textarea>
+    </div>
+  </div>
+
+  <div id="settingsWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Settings.png" alt="icon"> Settings</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('settingsWindow')">Back</button>
+        <button class="close-btn" onclick="settingsApp.close()">Exit</button>
+      </div>
+    </div>
+    <div class="app-content settings-content">
+      <div class="settings-group-title">Wireless & Networks</div>
+      <div class="settings-item">
+        <div class="set-left">
+          <img src="icons/Network.png" class="set-icon">
+          <div class="set-info">
+            <div class="set-label">Wi-Fi / Network</div>
+            <div class="set-desc" id="setNetStatus">Checking...</div>
+          </div>
+        </div>
+        <div class="set-right"><label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label></div>
+      </div>
+      <div class="settings-group-title">Personalization</div>
+      <div class="settings-item" onclick="settingsApp.changeWallpaper()">
+        <div class="set-left"><img src="icons/Gallery.png" class="set-icon"><div class="set-info"><div class="set-label">Wallpaper</div><div class="set-desc">Change home screen background</div></div></div>
+        <div class="set-right">›</div>
+      </div>
+      <div class="settings-item" onclick="settingsApp.changeUsername()">
+        <div class="set-left"><img src="icons/Contact.png" class="set-icon"><div class="set-info"><div class="set-label">Username</div><div class="set-desc" id="setCurrentUser">Guest</div></div></div>
+        <div class="set-right">›</div>
+      </div>
+      <div class="settings-group-title">Device & Hardware</div>
+      <div class="settings-item">
+        <div class="set-left">
+          <svg class="set-icon" viewBox="0 0 24 24" fill="white"><path d="M16 4h-1V2h-6v2H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 16H9V6h6v14z"/></svg>
+          <div class="set-info"><div class="set-label">Battery</div><div class="set-desc" id="setBatteryDesc">Checking...</div></div>
+        </div>
+        <div class="set-right"><span class="set-val" id="setBatteryVal">--%</span></div>
+      </div>
+      <div class="settings-item" onclick="settingsApp.toggleFullscreen()">
+        <div class="set-left">
+          <svg class="set-icon" viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          <div class="set-info"><div class="set-label">Fullscreen Mode</div><div class="set-desc">Immersive experience</div></div>
+        </div>
+        <div class="set-right"><label class="switch"><input type="checkbox" id="setFullToggle"><span class="slider"></span></label></div>
+      </div>
+      <div class="settings-item">
+        <div class="set-left"><img src="icons/File_Manager.png" class="set-icon"><div class="set-info"><div class="set-label">Storage</div><div class="set-desc" id="setStorageDesc">Calculating...</div></div></div>
+      </div>
+      <div class="settings-item">
+        <div class="set-left">
+          <img src="icons/File_Manager.png" class="set-icon">
+          <div class="set-info">
+            <div class="set-label">Cloud Storage (Firebase)</div>
+            <div class="set-desc" id="setCloudStorageDesc">Calculating...</div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group-title">Performance & Graphics</div>
+      <div class="settings-item"><div class="set-info"><div class="set-label">GPU Renderer</div><div class="set-desc" id="setGPUInfo">Detecting...</div></div></div>
+      <div class="settings-item"><div class="set-info"><div class="set-label">Real-time FPS</div><div class="set-desc" id="setFPSVal">Measuring...</div></div></div>
+      <div class="settings-item" onclick="settingsApp.runBenchmark()">
+        <div class="set-info"><div class="set-label">CPU Benchmark</div><div class="set-desc" id="setBenchmarkResult">Tap to run speed test</div></div>
+        <div class="set-right"><span style="font-size:12px; color:#888;">RUN ›</span></div>
+      </div>
+      <div class="settings-group-title">System Specs</div>
+      <div class="settings-item"><div class="set-info"><div class="set-label">Browser Engine</div><div class="set-desc" id="setBrowserInfo">...</div></div></div>
+      <div class="settings-item"><div class="set-info"><div class="set-label">Display Resolution</div><div class="set-desc" id="setDisplayInfo">...</div></div></div>
+      <div class="settings-item"><div class="set-info"><div class="set-label">Hardware Concurrency</div><div class="set-desc" id="setCoresInfo">...</div></div></div>
+      <div class="settings-group-title">Device & Sound</div>
+      <div class="settings-item">
+        <div class="set-left">
+          <img src="icons/Music.png" class="set-icon"> 
+          <div class="set-info"><div class="set-label">Mute Sound</div><div class="set-desc" id="setMuteDesc">Disable all system sounds</div></div>
+        </div>
+        <div class="set-right"><label class="switch"><input type="checkbox" id="setMuteToggle" onchange="settingsApp.toggleMute()"><span class="slider"></span></label></div>
+      </div>
+      <div class="settings-group-title">Advanced</div>
+      <div class="settings-item" onclick="settingsApp.resetData()">
+        <div class="set-info"><div class="set-label" style="color: #ff4444;">Reset</div><div class="set-desc">Clear all data and restart</div></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="createWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title"><img src="icons/Create.png" onerror="this.src='icons/File.png'" style="width:24px;height:24px;"> Create</div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('createWindow')">Back</button>
+        <button class="close-btn" onclick="createApp.close()">Exit</button>
+      </div>
+    </div>
+    <div class="app-content padded" style="display:flex; flex-direction:column; gap:10px;">
+      <input type="text" id="createAppName" class="form-input" placeholder="App Name" inputmode="none" autocomplete="off">
+      <input type="text" id="createAppIcon" class="form-input" placeholder="Icon URL (Optional)" inputmode="none" autocomplete="off">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+         <label style="font-size:12px; color:#aaa;">Source Code (HTML):</label>
+         <input type="file" id="createFileUpload" accept=".html,.txt" hidden onchange="createApp.handleFileUpload(this)">
+         <button onclick="document.getElementById('createFileUpload').click()" style="background:#444; color:#fff; border:0; padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer;">Upload File</button>
+      </div>
+      <textarea id="createAppCode" class="editor-area" style="flex:1; min-height:200px; font-family:monospace;" placeholder="<h1>Hello World</h1>" inputmode="none"></textarea>
+      <button class="btn-save" onclick="createApp.saveApp()">Install App</button>
+      <div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
+        <label style="font-size:12px; color:#aaa;">Installed Apps:</label>
+        <div id="createAppList" style="margin-top:5px; display:flex; flex-direction:column; gap:5px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewerWindow" class="app-window">
+    <div class="window-header">
+      <div class="window-title" id="viewerTitle"><img id="viewerIcon" src="icons/File.png" style="width:24px;height:24px;"><span id="viewerNameText">App Viewer</span></div>
+      <div class="window-controls">
+        <button class="back-btn" onclick="windowOps.back('viewerWindow')">Back</button>
+        <button class="close-btn" onclick="windowOps.close('viewerWindow')">Exit</button>
+      </div>
+    </div>
+    <div class="app-content no-scroll">
+      <iframe id="viewerFrame" style="width:100%; height:100%; border:none; background:#fff;"></iframe>
+    </div>
+  </div>
+
+  <div id="contextMenu"><div id="changeBg">Change Wallpaper</div></div>
+  <input type="file" id="bgInput" accept="image/*" hidden>
+  <div id="virtualKeyboard" class="v-keyboard"></div>
+  <div class="keyboard-spacer"></div>
+  <div id="clickOverlay" class="click-overlay" onclick="messengerApp.cancel()"></div>
+  <div id="usernameModal" class="username-bar">
+    <input type="text" id="usernameCustomInput" class="username-input" placeholder="Enter nickname (default: Guest)..." autocomplete="off" inputmode="none">
+    <button class="username-btn" onclick="messengerApp.saveUsername()">OK</button>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
